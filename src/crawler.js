@@ -2,30 +2,29 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const db = require('./db');  // DB 연결 코드
 
-// 사람인 채용 공고 목록 페이지 URL
 const url = 'https://www.saramin.co.kr/zf_user/jobs/list/job-category';
 
 async function crawlData() {
   try {
-    console.log('크롤링 시작: ', url);  // 크롤링 시작 메시지 출력
+    console.log('크롤링 시작: ', url);
 
-    // HTTP 요청
-    const response = await axios.get(url);  
-    console.log('HTTP 요청 성공, 상태 코드:', response.status);  // HTTP 상태 코드 출력
+    // axios 요청 시작
+    const response = await axios.get(url);
+    console.log('응답 받음, 상태 코드:', response.status);
 
     if (response.status !== 200) {
-      console.error('응답 상태 코드가 200이 아닙니다. 상태 코드:', response.status);
+      console.log('문제가 발생했습니다. 상태 코드:', response.status);
       return;
     }
 
     const $ = cheerio.load(response.data);  // HTML 파싱
+    console.log('HTML 파싱 완료');
 
-    // 데이터가 제대로 추출되고 있는지 확인
-    console.log("크롤링된 데이터 출력:");
+    // 데이터 추출
     $('div.job_list ul li').each((index, element) => {
-      const jobTitle = $(element).find('a').text().trim();  // 채용 공고 제목
-      const companyName = $(element).find('.company').text().trim();  // 회사명
-      const location = $(element).find('.location').text().trim();  // 위치
+      const jobTitle = $(element).find('a').text().trim();
+      const companyName = $(element).find('.company').text().trim();
+      const location = $(element).find('.location').text().trim();
 
       console.log('Job Title:', jobTitle);
       console.log('Company Name:', companyName);
@@ -39,7 +38,6 @@ async function crawlData() {
           return;
         }
         console.log('채용 공고 데이터가 DB에 저장되었습니다.');
-        console.log('Insert Result:', result); // 삽입 결과 출력
       });
     });
   } catch (error) {
@@ -47,5 +45,4 @@ async function crawlData() {
   }
 }
 
-// 크롤링 함수 실행
 crawlData();
