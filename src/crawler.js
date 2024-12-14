@@ -1,27 +1,40 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const db = require('./db');  // DB 연결 코드
 
-// 사람인 사이트에서 채용 공고 데이터를 크롤링하는 함수
-async function crawlJobs() {
-  const url = 'https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=xxxxx'; // 크롤링할 URL로 변경
-  const response = await axios.get(url);  // URL에서 데이터 가져오기
-  const $ = cheerio.load(response.data);   // HTML 데이터 파싱
+// 크롤링할 사람인 채용 공고 페이지 URL
+const url = 'https://www.saramin.co.kr/zf_user/jobs/list/domestic'; // 실제 URL로 변경
 
-  // 예시: 공고 제목 추출
-  const jobTitle = $('h1.job_title').text();
-  console.log('Job Title:', jobTitle); // 콘솔에 출력
+async function crawlData() {
+  try {
+    const response = await axios.get(url);
+    const $ = cheerio.load(response.data);
 
-  // 다른 필요한 데이터 추출 (예: 회사명, 지역 등)
-  const companyName = $('span.company').text();
-  const location = $('div.location').text();
-  const jobDescription = $('div.job_description').text();
+    // 데이터 추출 (예: 공고 제목, 회사명 등)
+    const jobTitle = $('h1.job_title').text();
+    const companyName = $('span.company').text();
+    const location = $('div.location').text();
+    const jobDescription = $('div.job_description').text();
 
-  console.log('Company Name:', companyName);
-  console.log('Location:', location);
-  console.log('Job Description:', jobDescription);
+    // 추출한 데이터 콘솔에 출력
+    console.log('Job Title:', jobTitle);
+    console.log('Company Name:', companyName);
+    console.log('Location:', location);
+    console.log('Job Description:', jobDescription);
 
-  // 이후 MySQL에 데이터를 저장하거나, 파일로 저장할 수 있습니다.
+    // 데이터베이스에 저장
+    const query = 'INSERT INTO jobs (title, company_name, location, job_description) VALUES (?, ?, ?, ?)';
+    db.query(query, [jobTitle, companyName, location, jobDescription], (err, result) => {
+      if (err) {
+        console.error('데이터베이스에 저장 실패:', err.message);
+        return;
+      }
+      console.log('채용 공고 데이터가 DB에 저장되었습니다.');
+    });
+  } catch (error) {
+    console.error('크롤링 중 오류 발생:', error.message);
+  }
 }
 
-// 크롤러 실행
-crawlJobs().catch(console.error);
+// 크롤링 함수 실행
+crawlData();
