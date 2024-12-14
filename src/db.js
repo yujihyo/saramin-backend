@@ -2,7 +2,7 @@ const mysql = require('mysql2');
 
 // MySQL 연결 설정
 const db = mysql.createConnection({
-  host: 'localhost',    // MySQL 서버 주소 (로컬에서 실행 중이면 localhost)
+  host: 'localhost',    // MySQL 서버 주소
   user: 'root',         // MySQL 사용자명
   password: 'Rgh1226!',  // MySQL 비밀번호
   database: 'saramin_db', // 사용할 데이터베이스 이름

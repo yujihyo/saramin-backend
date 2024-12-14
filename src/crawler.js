@@ -10,7 +10,7 @@ async function crawlData() {
     const response = await axios.get(url);  // URL에서 HTML 데이터 가져오기
     const $ = cheerio.load(response.data);  // HTML 파싱
 
-    // 채용 공고 목록에서 데이터 추출 (예시: 제목, 회사명, 위치)
+    // 채용 공고 목록에서 데이터 추출 (예: 제목, 회사명, 위치)
     $('div.job_list ul li').each((index, element) => {
       const jobTitle = $(element).find('a').text().trim();  // 채용 공고 제목
       const companyName = $(element).find('.company').text().trim();  // 회사명
@@ -28,6 +28,7 @@ async function crawlData() {
           return;
         }
         console.log('채용 공고 데이터가 DB에 저장되었습니다.');
+        console.log('Insert Result:', result); // 삽입 결과 출력
       });
     });
   } catch (error) {
