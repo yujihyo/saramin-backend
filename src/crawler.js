@@ -13,21 +13,20 @@ async function crawlData() {
     const response = await axios.get(url);  
     console.log('HTTP 요청 성공, 상태 코드:', response.status);  // HTTP 상태 코드 출력
 
-    // 응답 데이터 확인
-    if (!response.data) {
-      console.error('응답 데이터가 없습니다.');
+    if (response.status !== 200) {
+      console.error('응답 상태 코드가 200이 아닙니다. 상태 코드:', response.status);
       return;
     }
 
     const $ = cheerio.load(response.data);  // HTML 파싱
 
     // 데이터가 제대로 추출되고 있는지 확인
+    console.log("크롤링된 데이터 출력:");
     $('div.job_list ul li').each((index, element) => {
       const jobTitle = $(element).find('a').text().trim();  // 채용 공고 제목
       const companyName = $(element).find('.company').text().trim();  // 회사명
       const location = $(element).find('.location').text().trim();  // 위치
 
-      // 크롤링된 데이터 출력
       console.log('Job Title:', jobTitle);
       console.log('Company Name:', companyName);
       console.log('Location:', location);
