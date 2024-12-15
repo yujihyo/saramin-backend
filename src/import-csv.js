@@ -1,17 +1,12 @@
-const fs = require('fs');
-const csv = require('csv-parser');
-const db = require('./db'); // 데이터베이스 연결 가져오기
-
-// CSV 파일 경로
-const csvFilePath = './random_50_jobs.csv';
-
 fs.createReadStream(csvFilePath)
   .pipe(csv())
   .on('data', (row) => {
-    // CSV의 각 행에서 데이터를 추출
+    // 각 행에서 데이터 추출
     const { title, company_name, location, job_description } = row;
 
-    // MySQL에 데이터 삽입
+    // 쿼리 전에 삽입할 데이터 로그 출력
+    console.log('삽입할 데이터:', [title, company_name, location, job_description]);
+
     const query = 'INSERT INTO jobs (title, company_name, location, job_description) VALUES (?, ?, ?, ?)';
     db.query(query, [title, company_name, location, job_description], (err, result) => {
       if (err) {
@@ -23,5 +18,8 @@ fs.createReadStream(csvFilePath)
   })
   .on('end', () => {
     console.log('CSV 데이터 삽입 완료');
-    db.end(); // 데이터베이스 연결 종료
+    db.end();
+  })
+  .on('error', (err) => {
+    console.error('CSV 파일 읽기 오류:', err.message);
   });
