@@ -1,4 +1,4 @@
-const axios = require('axios');
+/* const axios = require('axios');
 const cheerio = require('cheerio');
 const db = require('./db');  // DB 연결 코드
 
@@ -45,4 +45,4 @@ async function crawlData() {
   }
 }
 
-crawlData();
+crawlData(); */
